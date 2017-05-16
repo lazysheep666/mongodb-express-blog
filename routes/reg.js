@@ -1,0 +1,43 @@
+var express = require('express');
+var router = express.Router();
+var crypto = require('crypto');
+var User = require('../models/user.js');
+var middlewares = require('../middlewares/middlewares.js');
+router.get('/', middlewares.checkNotLogin, function (req, res) {
+  res.render('reg', {
+    title: '注册',
+    user: req.session.user,
+    success: req.flash('success').toString(),
+    error: req.flash('error').toString()
+  });
+});
+
+router.post('/', middlewares.checkNotLogin, function (req, res) {
+  var name = req.body.name,
+      password = req.body.password,
+      password_re = req.body['password-repeat'];
+      //检验两次密码是否一致
+      if (password_re != password) {
+        req.flash('error', '两次输入的密码不一致!');
+        return res.redirect('/reg');//返回注册页
+      }
+      //生成密码的md5值
+      var md5 = crypto.createHash('md5'),
+          password = md5.update(req.body.password).digest('hex');
+      var newUser = new User ({
+        'name': req.body.name,
+        'password': req.body.password,
+        'email': req.body.email
+      });
+      newUser.save(function (err, user) {
+        if (err) {
+          req.flash('error', '用户名已存在');
+          return res.redirect('/reg');//返回注册页
+        }
+        req.session.user = user;
+        req.flash('success', '注册成功');
+        res.redirect('/');//注册成功后返回主页
+      });
+});
+
+module.exports = router;
