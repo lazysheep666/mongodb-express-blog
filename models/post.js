@@ -7,9 +7,9 @@ var PostSchema = new mongoose.Schema({
   post: String,
   comments: [{
     name: String,
+    website: String,
     time: String,
-    title: String,
-    comment: String
+    content: String
   }]
 });
 

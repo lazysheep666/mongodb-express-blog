@@ -1,0 +1,21 @@
+<br>
+<% var time = post.time.split(" ")[0] + "-" + post.time.split(" ")[1] %>
+<% post.comments.forEach(function (comment, index) { %>
+  <p><a href="<%= comment.website %>"><%= comment.name %></a>
+  <span class="info"> 回复于 <%= comment.time %></span></p>
+  <p><%- comment.content %></p>
+<% }) %>
+
+<form class="" action="/u/<%= post.name %>/<%= time %>/<%= post.title %>" method="post">
+  <% if (user) { %>
+  姓名: <input type="text" name="name" value="<%= user.name %>"><br>
+  网址: <input type="text" name="website" value="/u/<%= user.name %>"><br>
+  <% } else { %>
+  姓名: <input type="text" name="name" value=""><br>
+  网址: <input type="text" name="website" value="http://"><br>
+  <% } %>
+
+
+  <textarea name="content" rows="5" cols="80"></textarea><br>
+  <input type="submit" name="" value="留言">
+</form>

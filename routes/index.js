@@ -40,4 +40,8 @@ module.exports = function (app) {
   app.use('/edit', require('./edit.js'));
 
   app.use('/remove', require('./remove.js'));
+
+  app.use(function (req, res) {
+    res.render("404");
+  })
 }
