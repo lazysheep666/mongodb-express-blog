@@ -3,22 +3,24 @@ var crypto = require('crypto'),
     Post = require('../models/post.js'),
     markdown = require('markdown').markdown;
 module.exports = function (app) {
-  var posts;
+  var total;
   app.get('/', function (req, res) {
-    var promise = Post.find({}).sort({time: -1}).exec(function (err, post) {
-      if (err && !post) {
-        posts = [];
-      }
-      posts = post;
+    var page = req.query.p ? parseInt(req.query.p) : 1;
+    var promise = Post.find({}).exec();
+    promise.then(function (posts) {
+      total = posts.length;
+      return  Post.find({}).sort({time: -1}).skip((page - 1) * 10).limit(10).exec()
+    }).then(function (posts) {
       posts.forEach(function (doc) {
         doc.post = markdown.toHTML(doc.post);
       });
-    });
-    promise.then(function () {
       res.render('index', {
         title: '主页',
         user: req.session.user,
         posts: posts,
+        page: page,
+        isFirstPage: (page - 1) == 0,
+        isLastPage: ((page - 1) * 10 + posts.length) == total,
         success: req.flash('success').toString(),
         error: req.flash('error').toString()
       });

@@ -3,40 +3,51 @@ var router = express.Router();
 var Post = require('../models/post.js');
 var User = require('../models/user.js');
 var markdown = require('markdown').markdown;
-var posts;
-var user;
+
 router.get('/:name', function (req, res) {
   //检查用户名是否存在
-  User.findOne({"name": req.params.name}).exec(function (err, output) {
-    if (err) {
-      req.flash('error', err);
-      return res.redirect('/');//跳转到主页
-    } else if (!output) {
+  var userName;
+  var total;
+  var page = req.query.p ? parseInt(req.query.p) : 1;
+  var promise = User.findOne({"name": req.params.name}).exec();
+  promise.then(function (user) {
+    if (!user) {
       req.flash('error', '未找到用户');
       return res.redirect('/');//跳转到主页
     }
-    user = output;
-  });
-
-  var promise = Post.find({"name": req.params.name}).sort({time: -1}).exec(function (err, post) {
-    if (err) {
-      req.flash('error', err);
-      return res.redirect('/');
-    }
-    posts = post;
+    userName = user.name;
+    return  Post.find({"name": req.params.name}).exec()
+  },
+  function (err) {
+    req.flash('error', err);
+    return res.redirect('/');//跳转到主页
+  })
+  .then(function (posts) {
+    total = posts.length;
+    return  Post.find({"name": req.params.name}).sort({time: -1}).skip((page - 1) * 10).limit(10).exec();
+  },
+  function (err) {
+    req.flash('error', err);
+    return res.redirect('/');
+  })
+  .then(function (posts) {
     posts.forEach(function (doc) {
       doc.post = markdown.toHTML(doc.post);
     });
-  });
-
-  promise.then(function () {
     res.render('user', {
-      title: user.name,
+      title: userName,
       posts: posts,
       user: req.session.user,
+      page: page,
+      isFirstPage: (page - 1) == 0,
+      isLastPage: ((page - 1) * 10 + posts.length) == total,
       success: req.flash('success').toString(),
       error: req.flash('error').toString()
     });
+    },
+    function (err) {
+    req.flash('error', err);
+    return res.redirect('/');
   });
 });
 
