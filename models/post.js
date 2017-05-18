@@ -5,12 +5,17 @@ var PostSchema = new mongoose.Schema({
   time: String,
   title: String,
   post: String,
+  tags: [String],
   comments: [{
     name: String,
     website: String,
     time: String,
     content: String
-  }]
+  }],
+  pv: {
+    type: Number,
+    default: 0
+  }
 });
 
 var Post = mongoose.model('Post', PostSchema);

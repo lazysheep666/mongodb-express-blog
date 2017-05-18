@@ -56,7 +56,7 @@ router.get('/:name/:day/:title', function (req, res) {
     "name": req.params.name,
     "title": req.params.title,
     "time": req.params.day.split('-')[0] + '-' + req.params.day.split('-')[1] + '-' + req.params.day.split('-')[2] + ' ' + req.params.day.split('-')[3]
-  }).exec(function (err, post) {
+  }).update({$inc: {'pv': 1}}).exec(function (err, post) {
     if (err) {
       req.flash('error', err);
       return res.redirect('/');

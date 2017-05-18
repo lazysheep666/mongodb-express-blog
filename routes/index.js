@@ -37,6 +37,12 @@ module.exports = function (app) {
 
   app.use('/upload', require('./upload.js'));
 
+  app.use('/archive', require('./archive.js'));
+
+  app.use('/tags', require('./tags.js'));
+
+  app.use('/search',require('./search.js'));
+
   app.use('/u', require('./u.js'));
 
   app.use('/edit', require('./edit.js'));

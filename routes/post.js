@@ -18,6 +18,7 @@ router.post('/', middlewares.checkLogin, function (req, res) {
   post = new Post({
     'name': currentUser,
     'time': currentTime,
+    'tags': [req.body.tag1, req.body.tag2, req.body.tag3],
     'title': req.body.title,
     'post': req.body.post
   });
